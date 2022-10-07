@@ -1,4 +1,4 @@
-package org.universityit.project.medicationassistantbot.model;
+package org.universityit.project.medicationsassistantbot.model;
 
 import org.springframework.data.repository.CrudRepository;
 

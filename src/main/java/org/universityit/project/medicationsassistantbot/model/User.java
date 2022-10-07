@@ -1,4 +1,4 @@
-package org.universityit.project.medicationassistantbot.model;
+package org.universityit.project.medicationsassistantbot.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

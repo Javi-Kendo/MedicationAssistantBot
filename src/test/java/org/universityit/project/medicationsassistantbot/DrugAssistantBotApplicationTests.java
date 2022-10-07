@@ -1,4 +1,4 @@
-package org.universityit.project.medicationassistantbot;
+package org.universityit.project.medicationsassistantbot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

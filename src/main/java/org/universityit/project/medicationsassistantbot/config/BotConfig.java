@@ -1,4 +1,4 @@
-package org.universityit.project.medicationassistantbot.config;
+package org.universityit.project.medicationsassistantbot.config;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

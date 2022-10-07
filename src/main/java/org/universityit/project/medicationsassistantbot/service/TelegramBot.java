@@ -1,4 +1,4 @@
-package org.universityit.project.medicationassistantbot.service;
+package org.universityit.project.medicationsassistantbot.service;
 
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.universityit.project.medicationassistantbot.config.BotConfig;
-import org.universityit.project.medicationassistantbot.model.User;
-import org.universityit.project.medicationassistantbot.model.UserRepository;
+import org.universityit.project.medicationsassistantbot.config.BotConfig;
+import org.universityit.project.medicationsassistantbot.model.User;
+import org.universityit.project.medicationsassistantbot.model.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -95,6 +95,18 @@ public class TelegramBot extends TelegramLongPollingBot {
                     case "/register":
                         register(chatId);
                         break;
+                    case "/addMedications":
+                        addMedications(chatId);
+                        break;
+                    case "/getMyMedications":
+                        getMedications(chatId);
+                        break;
+                    case "/checkOrChangeMyData":
+                        checkOrChangeData(chatId);
+                        break;
+                    case "/deleteMyData":
+                        deleteUserData(chatId);
+                        break;
                     default:
                         prepareAndSendMessage(chatId, "Sorry, command was not recognized " +
                                 "(Извините, команда не распознана)");
@@ -106,13 +118,87 @@ public class TelegramBot extends TelegramLongPollingBot {
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
             if (callbackData.equals(YES_BUTTON)) {
-                String text = "You pressed YES button";
+                String text = "Register completed successfully.";
                 executeEditMessageText(text, chatId, messageId);
             } else if (callbackData.equals(NO_BUTTON)) {
-                String text = "You pressed NO button";
+                String text = "Register cancelled.";
                 executeEditMessageText(text, chatId, messageId);
             }
         }
+    }
+
+    private void deleteUserData(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Do you really want to delete your data?");
+
+        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+        var yesButton = new InlineKeyboardButton();
+
+        yesButton.setText("Yes");
+        yesButton.setCallbackData(YES_BUTTON);
+
+        var noButton = new InlineKeyboardButton();
+
+        noButton.setText("No");
+        noButton.setCallbackData(NO_BUTTON);
+
+        rowInLine.add(yesButton);
+        rowInLine.add(noButton);
+
+        rowsInLine.add(rowInLine);
+
+        markupInLine.setKeyboard(rowsInLine);
+        message.setReplyMarkup(markupInLine);
+
+        executeMessage(message);
+    }
+
+    private void checkOrChangeData(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Select an action.");
+
+        executeMessage(message);
+    }
+
+    private void getMedications(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Do you really want a list of your medications?");
+
+        executeMessage(message);
+    }
+
+    private void addMedications(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Do you really want to add medications?");
+
+        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> rowInLine = new ArrayList<>();
+        var yesButton = new InlineKeyboardButton();
+
+        yesButton.setText("Yes");
+        yesButton.setCallbackData(YES_BUTTON);
+
+        var noButton = new InlineKeyboardButton();
+
+        noButton.setText("No");
+        noButton.setCallbackData(NO_BUTTON);
+
+        rowInLine.add(yesButton);
+        rowInLine.add(noButton);
+
+        rowsInLine.add(rowInLine);
+
+        markupInLine.setKeyboard(rowsInLine);
+        message.setReplyMarkup(markupInLine);
+
+        executeMessage(message);
     }
 
     private void register(long chatId) {
@@ -182,16 +268,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         KeyboardRow row = new KeyboardRow();
 
-        row.add("weather");
-        row.add("get random joke");
+        row.add("/addMedications");
+        row.add("/getMyMedications");
 
         keyboardRows.add(row);
 
         row = new KeyboardRow();
 
-        row.add("register");
-        row.add("check my data");
-        row.add("delete my data");
+        row.add("/register");
+        row.add("/checkOrChangeMyData");
+        row.add("/deleteMyData");
 
         keyboardRows.add(row);
 
