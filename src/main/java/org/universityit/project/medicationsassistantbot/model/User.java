@@ -3,6 +3,7 @@ package org.universityit.project.medicationsassistantbot.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity(name = "usersDataTable")
 public class User {
@@ -17,6 +18,16 @@ public class User {
     private String userName;
 
     private Timestamp registeredAt;
+
+    private String userMedications;
+
+    public String getUserMedications() {
+        return userMedications;
+    }
+
+    public void setUserMedications(String userMedications) {
+        this.userMedications = userMedications;
+    }
 
     public Long getChatId() {
         return chatId;

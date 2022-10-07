@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.universityit.project.medicationsassistantbot.config.BotConfig;
+import org.universityit.project.medicationsassistantbot.model.Medication;
 import org.universityit.project.medicationsassistantbot.model.User;
 import org.universityit.project.medicationsassistantbot.model.UserRepository;
 
@@ -44,6 +45,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     static final String NO_BUTTON = "NO_BUTTON";
     static final String ERROR_TEXT = "Error occurred: ";
 
+    List<Medication> medicationList = listPopulate(new ArrayList<>());
+
     public TelegramBot(BotConfig config) {
         this.config = config;
         List<BotCommand> listofCommands = new ArrayList<>();
@@ -52,6 +55,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         listofCommands.add(new BotCommand("/deletedata", "delete my data"));
         listofCommands.add(new BotCommand("/help", "info how to use this bot"));
         listofCommands.add(new BotCommand("/settings", "set your preferences"));
+        listofCommands.add(new BotCommand("/a", "0"));
+        listofCommands.add(new BotCommand("/b", "1"));
+        listofCommands.add(new BotCommand("/c", "2"));
         try {
             this.execute(new SetMyCommands(listofCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -104,6 +110,15 @@ public class TelegramBot extends TelegramLongPollingBot {
                     case "/checkOrChangeMyData":
                         checkOrChangeData(chatId);
                         break;
+                    case "/a":
+                        commandAddMedications(chatId, "a", update.getMessage());
+                        break;
+                    case "/b":
+                        commandAddMedications(chatId, "b", update.getMessage());
+                        break;
+                    case "/c":
+                        commandAddMedications(chatId, "c", update.getMessage());
+                        break;
                     case "/deleteMyData":
                         deleteUserData(chatId);
                         break;
@@ -123,8 +138,81 @@ public class TelegramBot extends TelegramLongPollingBot {
             } else if (callbackData.equals(NO_BUTTON)) {
                 String text = "Register cancelled.";
                 executeEditMessageText(text, chatId, messageId);
+            } else if (callbackData.equals("ADD_BUTTON")) {
+                String text = "Type the name of the medication.";
+                executeEditMessageText(text, chatId, messageId);
             }
         }
+    }
+
+    private void commandAddMedications(long chatId2, String medicationName, Message msg) {
+        SendMessage message = new SendMessage();
+        long medicationNumber = -1;
+        String status = "";
+
+        for (int i = 0; i < 4; i++) {
+            if (medicationName.equals(medicationList.get(i).getName())) {
+                medicationNumber = i;
+            }
+        }
+        message.setChatId(String.valueOf(chatId2));
+
+        if (medicationNumber > -1) {
+            if(!userRepository.findById(msg.getChatId()).isEmpty()) {
+
+                var chatId = msg.getChatId();
+                var chat = msg.getChat();
+
+                User user = userRepository.findById(chatId).get();
+                if (medicationName.equals("c") && !user.getUserMedications().contains("a" + ";")) {
+                    user.setChatId(chatId);
+                    user.setFirstName(chat.getFirstName());
+                    user.setLastName(chat.getLastName());
+                    user.setUserName(chat.getUserName());
+                    user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+                    if (user.getUserMedications().contains(medicationName + ";")) {
+                        status = "The medication is already on your list.";
+                    } else {
+                        user.setUserMedications(user.getUserMedications() + medicationName + ";");
+                    }
+                    userRepository.save(user);
+                    log.info("user saved: " + user);
+                } else if (medicationName.equals("c")) {
+                    user.setChatId(chatId);
+                    user.setFirstName(chat.getFirstName());
+                    user.setLastName(chat.getLastName());
+                    user.setUserName(chat.getUserName());
+                    user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+                    /*if (user.getUserMedications().contains(medicationName + ";")) {
+                        status = "The medication is already on your list.";
+                    } else {
+                        user.setUserMedications(user.getUserMedications() + medicationName + ";");
+                    }*/
+                    status = "Medications are incompatible.";
+                    userRepository.save(user);
+                    log.info("user saved: " + user);
+                } else {
+                    user.setChatId(chatId);
+                    user.setFirstName(chat.getFirstName());
+                    user.setLastName(chat.getLastName());
+                    user.setUserName(chat.getUserName());
+                    user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+                    if (user.getUserMedications().contains(medicationName + ";")) {
+                        status = "The medication is already on your list.";
+                    } else {
+                        user.setUserMedications(user.getUserMedications() + medicationName + ";");
+                    }
+                    userRepository.save(user);
+                    log.info("user saved: " + user);
+                }
+            }
+            if (status.length() == 0) {
+                message.setText("Successfully!");
+            } else {
+                message.setText(status);
+            }
+        }
+        executeMessage(message);
     }
 
     private void deleteUserData(long chatId) {
@@ -182,8 +270,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> rowInLine = new ArrayList<>();
         var yesButton = new InlineKeyboardButton();
 
-        yesButton.setText("Yes");
-        yesButton.setCallbackData(YES_BUTTON);
+        yesButton.setText("Add");
+        yesButton.setCallbackData("ADD_BUTTON");
 
         var noButton = new InlineKeyboardButton();
 
@@ -200,6 +288,20 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         executeMessage(message);
     }
+
+    /*private void addMedicationInTable(Message msg) {
+        if(!userRepository.findById(msg.getChatId()).isEmpty()) {
+
+            var chat = msg.getChat();
+
+            User user = new User();
+
+            user.setUserMedications(chat + ";");
+
+            userRepository.save(user);
+            log.info("user add medication: " + user);
+        }
+    }*/
 
     private void register(long chatId) {
         SendMessage message = new SendMessage();
@@ -314,5 +416,32 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
         executeMessage(message);
+    }
+
+    private List<Medication> listPopulate(List<Medication> medicationList) {
+        Medication medication_A = new Medication();
+        Medication medication_B = new Medication();
+        Medication medication_C = new Medication();
+        Medication medication_D = new Medication();
+        Medication medication_E = new Medication();
+
+        medication_A.setName("a");
+        medication_A.setMedicationId(0L);
+        medication_B.setName("b");
+        medication_B.setMedicationId(1L);
+        medication_C.setName("c");
+        medication_C.setMedicationId(2L);
+        medication_D.setName("d");
+        medication_D.setMedicationId(3L);
+        medication_E.setName("e");
+        medication_E.setMedicationId(4L);
+
+        medicationList.add(medication_A);
+        medicationList.add(medication_B);
+        medicationList.add(medication_C);
+        medicationList.add(medication_D);
+        medicationList.add(medication_E);
+
+        return medicationList;
     }
 }
