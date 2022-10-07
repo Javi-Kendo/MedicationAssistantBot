@@ -89,7 +89,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                     prepareAndSendMessage(user.getChatId(), textToSend);
                 }
             } else {
-
                 switch (messageText) {
                     case "/start":
                         registerUser(update.getMessage());
