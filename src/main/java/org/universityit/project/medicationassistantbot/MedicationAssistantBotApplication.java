@@ -1,13 +1,13 @@
-package org.universityit.project.drugassistantbot;
+package org.universityit.project.medicationassistantbot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DrugAssistantBotApplication {
+public class MedicationAssistantBotApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DrugAssistantBotApplication.class, args);
+        SpringApplication.run(MedicationAssistantBotApplication.class, args);
     }
 
 }

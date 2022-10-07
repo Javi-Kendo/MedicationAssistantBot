@@ -1,4 +1,4 @@
-package org.universityit.project.drugassistantbot.config;
+package org.universityit.project.medicationassistantbot.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import org.universityit.project.drugassistantbot.service.TelegramBot;
+import org.universityit.project.medicationassistantbot.service.TelegramBot;
 
 @Slf4j
 @Component
